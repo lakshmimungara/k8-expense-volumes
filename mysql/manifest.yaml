@@ -1,76 +1,75 @@
-kind: Service
-apiVersion: v1
-metadata:
-  name: mysql-headless
-  namespace: expense
-spec:
-  clusterIP: None # for headless service there is no cluster IP
-  selector:
-    project: expense
-    component: mysql
-    tier: db
-  ports:
-  - protocol: TCP
-    port: 3306 # service port
-    targetPort: 3306
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: mysql
-  namespace: expense
-spec:
-  selector:
-    project: expense
-    component: mysql
-    tier: db
-  ports:
-  - protocol: TCP
-    port: 3306 # service port
-    targetPort: 3306
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: mysql
-  namespace: expense
-spec:
-  selector:
-    matchLabels:
-      project: expense
-      component: mysql
-      tier: db
-  serviceName: "mysql-headless" # this is the headless service should be mentioned for statefulset
-  replicas: 2 # 
-  template:
-    metadata:
-      labels:
-        project: expense
-        component: mysql
-        tier: db
-    spec:
-      initContainers:
-        - name: init-permissions
-          image: busybox
-          command: ["sh", "-c", "chown -R 1001:1001 /var/lib/mysql"]
-          volumeMounts:
-            - name: mysql
-              mountPath: /var/lib/mysql
-      containers:
-        - name: mysql
-          image: mahalakshmi2997/mysql:v1
-          securityContext:
-            runAsUser: 1001
-          volumeMounts:
-            - name: mysql
-              mountPath: /var/lib/mysql
-  # This is PVC defnition, directly mentioned here
-  volumeClaimTemplates:
-  - metadata:
-      name: mysql
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "expense-ebs"
-      resources:
-        requests:
-          storage: 1Gi
+kind: Service                              # Defines the resource type as Service
+apiVersion: v1                             # Specifies the API version (v1) for the resource
+metadata:                                  # Metadata information about the Service
+  name: mysql-headless                     # Sets the name of the Service to "mysql-headless"
+  namespace: expense                       # Specifies the namespace where the Service is created
+spec:                                      # Specification of the Service
+  clusterIP: None                         # Configures the Service as a headless service, meaning it has no cluster IP
+  selector:                                # Selector to identify the Pods targeted by this Service
+    project: expense                      # Matches Pods with the label "project: expense"
+    component: mysql                      # Matches Pods with the label "component: mysql"
+    tier: db                              # Matches Pods with the label "tier: db"
+  ports:                                   # Ports configuration for the Service
+  - protocol: TCP                          # Specifies the protocol as TCP
+    port: 3306                            # Defines the port exposed by the Service
+    targetPort: 3306                       # Specifies the port on the Pod to which traffic will be directed
+---                                        # Separator for defining multiple Kubernetes resources
+kind: Service                              # Defines the resource type as Service
+apiVersion: v1                             # Specifies the API version (v1) for the resource
+metadata:                                  # Metadata information about the Service
+  name: mysql                              # Sets the name of the Service to "mysql"
+  namespace: expense                       # Specifies the namespace where the Service is created
+spec:                                      # Specification of the Service
+  selector:                                # Selector to identify the Pods targeted by this Service
+    project: expense                      # Matches Pods with the label "project: expense"
+    component: mysql                      # Matches Pods with the label "component: mysql"
+    tier: db                              # Matches Pods with the label "tier: db"
+  ports:                                   # Ports configuration for the Service
+  - protocol: TCP                          # Specifies the protocol as TCP
+    port: 3306                            # Defines the port exposed by the Service
+    targetPort: 3306                       # Specifies the port on the Pod to which traffic will be directed
+---                                        # Separator for defining multiple Kubernetes resources
+apiVersion: apps/v1                       # Specifies the API version (apps/v1) for the StatefulSet
+kind: StatefulSet                          # Defines the resource type as StatefulSet
+metadata:                                  # Metadata information about the StatefulSet
+  name: mysql                              # Sets the name of the StatefulSet to "mysql"
+  namespace: expense                       # Specifies the namespace where the StatefulSet is created
+spec:                                      # Specification of the StatefulSet
+  selector:                                # Selector to identify the Pods managed by this StatefulSet
+    matchLabels:                           # Matching labels for selecting Pods
+      project: expense                    # Matches Pods with the label "project: expense"
+      component: mysql                    # Matches Pods with the label "component: mysql"
+      tier: db                            # Matches Pods with the label "tier: db"
+  serviceName: "mysql-headless"           # References the headless service for network identity
+  replicas: 2                              # Specifies the number of desired Pod replicas
+  template:                                # Pod template used for creating the Pods
+    metadata:                              # Metadata information about the Pods
+      labels:                              # Labels for the Pods created by this StatefulSet
+        project: expense                  # Sets the label "project: expense"
+        component: mysql                  # Sets the label "component: mysql"
+        tier: db                          # Sets the label "tier: db"
+    spec:                                  # Specification for the Pods
+      initContainers:                      # Initialization containers to run before the main containers
+        - name: init-permissions          # Sets the name of the init container
+          image: busybox                  # Specifies the image used for the init container
+          command: ["sh", "-c", "chown -R 1001:1001 /var/lib/mysql"] # Command to change ownership of the directory
+          volumeMounts:                   # Volume mounts for the init container
+            - name: mysql                 # References the volume named "mysql"
+              mountPath: /var/lib/mysql   # Mount path in the init container
+      containers:                          # Main containers in the Pod
+        - name: mysql                      # Sets the name of the main container to "mysql"
+          image: mahalakshmi2997/mysql:v1  # Specifies the image used for the main container
+          securityContext:                 # Security settings for the container
+            runAsUser: 1001                # Specifies the user ID the container should run as
+          volumeMounts:                    # Volume mounts for the main container
+            - name: mysql                  # References the volume named "mysql"
+              mountPath: /var/lib/mysql    # Mount path in the main container
+  volumeClaimTemplates:                    # PVC definition for dynamically provisioning Persistent Volumes
+  - metadata:                              # Metadata information for the PVC
+      name: mysql                          # Sets the name of the PVC to "mysql"
+    spec:                                  # Specification of the PVC
+      accessModes: [ "ReadWriteOnce" ]    # Specifies the access mode for the PVC
+      storageClassName: "expense-ebs"      # Specifies the storage class to be used for the PVC
+      resources:                           # Resource requests for the PVC
+        requests:                          # Defines the resources requested
+          storage: 1Gi                     # Specifies the amount of storage requested (1 GiB)

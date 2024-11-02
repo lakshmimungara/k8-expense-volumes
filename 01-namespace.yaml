@@ -1,7 +1,7 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: expense
-  labels:
-    project: expense
-    environment: dev
+apiVersion: v1                              # Specifies the API version (v1) for the resource
+kind: Namespace                             # Defines the resource type as Namespace
+metadata:                                   # Metadata information about the Namespace
+  name: expense                             # Sets the name of the Namespace to "expense"
+  labels:                                   # Key-value pairs that categorize the Namespace
+    project: expense                        # Label indicating the project associated with this Namespace
+    environment: dev                       # Label indicating the environment type (development)

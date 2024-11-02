@@ -1,54 +1,53 @@
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: backend
-  namespace: expense
-data:
-  DB_HOST: mysql
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: backend
-  namespace: expense
-  labels:
-    app: backend
-    tier: api
-    project: expense
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: backend
-      tier: api
-      project: expense
-  template:
-    metadata:
-      labels:
-        app: backend
-        tier: api
-        project: expense
-    spec:
-      containers:
-      - name: backend
-        image: mahalakshmi2997/backend:v1
-        envFrom:
-        - configMapRef:
-            name: backend
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: backend
-  namespace: expense
-spec:
-  selector:
-    app: backend
-    tier: api
-    project: expense
-  ports:
-  - name: backend-port
-    protocol: TCP
-    port: 8080 # service port
-    targetPort: 8080 # container port
+apiVersion: v1                             # Specifies the API version (v1) for the ConfigMap
+kind: ConfigMap                             # Defines the resource type as ConfigMap
+metadata:                                   # Metadata information about the ConfigMap
+  name: backend                             # Sets the name of the ConfigMap to "backend"
+  namespace: expense                        # Specifies the namespace where the ConfigMap is created
+data:                                       # Data to be stored in the ConfigMap
+  DB_HOST: mysql                            # Key-value pair, setting "DB_HOST" to "mysql"
+---                                         # Separator for defining multiple Kubernetes resources
+apiVersion: apps/v1                        # Specifies the API version (apps/v1) for the Deployment
+kind: Deployment                            # Defines the resource type as Deployment
+metadata:                                   # Metadata information about the Deployment
+  name: backend                             # Sets the name of the Deployment to "backend"
+  namespace: expense                        # Specifies the namespace where the Deployment is created
+  labels:                                   # Labels associated with the Deployment
+    app: backend                            # Sets the label "app" to "backend"
+    tier: api                               # Sets the label "tier" to "api"
+    project: expense                        # Sets the label "project" to "expense"
+spec:                                       # Specification of the Deployment
+  replicas: 2                               # Specifies the number of desired Pod replicas
+  selector:                                 # Selector to identify the Pods managed by this Deployment
+    matchLabels:                            # Matching labels for selecting Pods
+      app: backend                          # Matches Pods with the label "app: backend"
+      tier: api                             # Matches Pods with the label "tier: api"
+      project: expense                      # Matches Pods with the label "project: expense"
+  template:                                 # Pod template used for creating the Pods
+    metadata:                               # Metadata information about the Pods
+      labels:                               # Labels for the Pods created by this Deployment
+        app: backend                        # Sets the label "app" to "backend"
+        tier: api                           # Sets the label "tier" to "api"
+        project: expense                    # Sets the label "project" to "expense"
+    spec:                                   # Specification for the Pods
+      containers:                           # Container definitions within the Pod
+      - name: backend                       # Sets the name of the container to "backend"
+        image: mahalakshmi2997/backend:v1  # Specifies the image used for the container
+        envFrom:                            # Environment variables sourced from ConfigMap
+        - configMapRef:                     # Reference to a ConfigMap
+            name: backend                   # Specifies the name of the ConfigMap to use
+---                                         # Separator for defining multiple Kubernetes resources
+kind: Service                               # Defines the resource type as Service
+apiVersion: v1                              # Specifies the API version (v1) for the Service
+metadata:                                   # Metadata information about the Service
+  name: backend                             # Sets the name of the Service to "backend"
+  namespace: expense                        # Specifies the namespace where the Service is created
+spec:                                       # Specification of the Service
+  selector:                                 # Selector to identify the Pods targeted by this Service
+    app: backend                            # Matches Pods with the label "app: backend"
+    tier: api                               # Matches Pods with the label "tier: api"
+    project: expense                        # Matches Pods with the label "project: expense"
+  ports:                                    # Ports configuration for the Service
+  - name: backend-port                      # Sets the name of the port to "backend-port"
+    protocol: TCP                           # Specifies the protocol as TCP
+    port: 8080                              # Defines the port exposed by the Service (service port)
+    targetPort: 8080                        # Specifies the port on the Pod to which traffic will be directed (container port)

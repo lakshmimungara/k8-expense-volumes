@@ -1,43 +1,43 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: frontend
-  namespace: expense
-  labels:
-    app: frontend
-    tier: web
-    project: expense
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: frontend
-      tier: web
-      project: expense
-  template:
-    metadata:
-      labels:
-        app: frontend
-        tier: web
-        project: expense
-    spec:
-      containers:
-      - name: frontend
-        image: mahalakshmi2997/frontend:v1
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: frontend
-  namespace: expense
-spec:
-  type: LoadBalancer
-  selector:
-    app: frontend
-    tier: web
-    project: expense
-  ports:
-  - name: frontend-port
-    protocol: TCP
-    port: 80 # service port
-    targetPort: 80 # container port
+apiVersion: apps/v1                        # Specifies the API version (apps/v1) for the Deployment
+kind: Deployment                           # Defines the resource type as Deployment
+metadata:                                  # Metadata information about the Deployment
+  name: frontend                           # Sets the name of the Deployment to "frontend"
+  namespace: expense                       # Specifies the namespace where the Deployment is created
+  labels:                                  # Labels associated with the Deployment
+    app: frontend                          # Sets the label "app" to "frontend"
+    tier: web                              # Sets the label "tier" to "web"
+    project: expense                       # Sets the label "project" to "expense"
+spec:                                      # Specification of the Deployment
+  replicas: 2                              # Specifies the number of desired Pod replicas
+  selector:                                # Selector to identify the Pods managed by this Deployment
+    matchLabels:                           # Matching labels for selecting Pods
+      app: frontend                        # Matches Pods with the label "app: frontend"
+      tier: web                            # Matches Pods with the label "tier: web"
+      project: expense                     # Matches Pods with the label "project: expense"
+  template:                                # Pod template used for creating the Pods
+    metadata:                              # Metadata information about the Pods
+      labels:                              # Labels for the Pods created by this Deployment
+        app: frontend                      # Sets the label "app" to "frontend"
+        tier: web                          # Sets the label "tier" to "web"
+        project: expense                   # Sets the label "project" to "expense"
+    spec:                                  # Specification for the Pods
+      containers:                          # Container definitions within the Pod
+      - name: frontend                     # Sets the name of the container to "frontend"
+        image: mahalakshmi2997/frontend:v1 # Specifies the image used for the container
+---                                        # Separator for defining multiple Kubernetes resources
+kind: Service                              # Defines the resource type as Service
+apiVersion: v1                             # Specifies the API version (v1) for the Service
+metadata:                                  # Metadata information about the Service
+  name: frontend                           # Sets the name of the Service to "frontend"
+  namespace: expense                       # Specifies the namespace where the Service is created
+spec:                                      # Specification of the Service
+  type: LoadBalancer                       # Specifies the type of Service as LoadBalancer
+  selector:                                # Selector to identify the Pods targeted by this Service
+    app: frontend                          # Matches Pods with the label "app: frontend"
+    tier: web                              # Matches Pods with the label "tier: web"
+    project: expense                       # Matches Pods with the label "project: expense"
+  ports:                                   # Ports configuration for the Service
+  - name: frontend-port                    # Sets the name of the port to "frontend-port"
+    protocol: TCP                          # Specifies the protocol as TCP
+    port: 80                               # Defines the port exposed by the Service (service port)
+    targetPort: 80                         # Specifies the port on the Pod to which traffic will be directed (container port)
