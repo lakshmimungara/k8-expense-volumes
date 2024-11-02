@@ -52,6 +52,7 @@ spec:
       containers:
       - name: mysql
         image: mahalakshmi2997/mysql:v1
+        command: ["sh", "-c", "chmod -R 777 /var/lib/mysql"]
         volumeMounts:
         - name: mysql
           mountPath: /var/lib/mysql
