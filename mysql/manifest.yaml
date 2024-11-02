@@ -49,13 +49,21 @@ spec:
         component: mysql
         tier: db
     spec:
+      initContainers:
+        - name: init-permissions
+          image: busybox
+          command: ["sh", "-c", "chown -R 1001:1001 /var/lib/mysql"]
+          volumeMounts:
+            - name: mysql
+              mountPath: /var/lib/mysql
       containers:
-      - name: mysql
-        image: mahalakshmi2997/mysql:v1
-        command: ["sh", "-c", "chmod -R 1001:1001 /var/lib/mysql"]
-        volumeMounts:
         - name: mysql
-          mountPath: /var/lib/mysql
+          image: mahalakshmi2997/mysql:v1
+          securityContext:
+            runAsUser: 1001
+          volumeMounts:
+            - name: mysql
+              mountPath: /var/lib/mysql
   # This is PVC defnition, directly mentioned here
   volumeClaimTemplates:
   - metadata:
