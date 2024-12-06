@@ -73,3 +73,11 @@ spec:                                      # Specification of the StatefulSet
       resources:                           # Resource requests for the PVC
         requests:                          # Defines the resources requested
           storage: 1Gi                     # Specifies the amount of storage requested (1 GiB)
+
+
+
+
+
+
+
+
